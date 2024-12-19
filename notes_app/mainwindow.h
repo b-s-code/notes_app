@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStandardItemModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,5 +20,11 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    /*
+    * 0th column is note name.
+    * 1st column is note content.
+    */
+    QStandardItemModel model{0, 2, nullptr};
 };
 #endif // MAINWINDOW_H
