@@ -18,6 +18,8 @@ NoteFile::NoteFile(std::string file_path)
             }
         }
 
+        file_paths_in_use.push_back(file_path);
+
         // It is now confirmed that file_path does not correspond to any file
         // already belonging to another NoteFile.  So either read the file's
         // contents, checking if they're of an appropriate length, or create the
@@ -55,6 +57,17 @@ NoteFile::NoteFile(std::string file_path)
 NoteFile::~NoteFile()
 {
     file.close();
+
+    {
+        std::scoped_lock<std::mutex> lock(files_in_use_collection_mutex);
+
+        auto iter = std::find(file_paths_in_use.begin(),
+                                file_paths_in_use.end(), path);
+
+        // The possibility of repeated occurences is addressed when *adding* to
+        // file_paths_in_use, rather than here.
+        file_paths_in_use.erase(iter);
+    }
 }
 
 void NoteFile::UpdateTitle(std::string new_title)
