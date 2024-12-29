@@ -24,29 +24,48 @@ NoteFile::NoteFile(std::string file_path)
         // file if it does not already exist.
         if (!QFile::exists(QString::fromStdString(file_path)))
         {
-            auto f = QFile(); // TODO : make this a member variable and close it
-                              // in destructor.  Or implement something else.
             auto open_mode_RW_text = QIODeviceBase::ReadWrite
                                      | QIODeviceBase::Text;
-            f.setFileName(QString::fromStdString(file_path));
-            f.open(open_mode_RW_text);
+            file.setFileName(QString::fromStdString(file_path));
+            file.open(open_mode_RW_text);
 
-            // TODO : write default title, padded up to 256 characters (consider
-            // whether want to use UTF-8 or UTF-16, noting that I may want to
-            // alternately use std::string/QString).  Leave contents empty.
+            // Default title is a placeholder string, then padded up to 256
+            // characters with spaces.  Default contents is simply empty.
+            std::string default_title = "Untitled";
 
+            title = default_title;
+            default_title += "                                                                                                                                                                                                                                                        ";
+            file.write(default_title.c_str());
         }
         else
         {
-            // TODO : read title and contents.
-        }
+            // The file apparently exists.
 
+            std::string title_and_contents = file.readAll().toStdString();
+
+            std::string title_from_file = title_and_contents.substr(0, 256);
+            std::string contents_from_file = title_and_contents.substr(256);
+
+            title = title_from_file;
+            contents = contents_from_file;
+        }
     }
+}
+
+NoteFile::~NoteFile()
+{
+    file.close();
 }
 
 void NoteFile::UpdateTitle(std::string new_title)
 {
     // TODO : update both memory and disk rep's.
+
+    // TODO : add a method which:
+    // - checks input string is no longer than 256 characters, and
+    // - returns a new string which consists in the input string, padded up to
+    //   256 characters with spaces.
+    // Some existing code could reuse this method.
 }
 
 void NoteFile::UpdateContents(std::string new_contents)
@@ -57,7 +76,7 @@ void NoteFile::UpdateContents(std::string new_contents)
 void NoteFile::DeleteNoteFile()
 {
     {
-        std::scoped_lock lock{NoteFile::files_in_use_collection_mutex};
+        std::scoped_lock lock {NoteFile::files_in_use_collection_mutex};
         // TODO :
         // - Remove file from disk.
         // - Update file_paths_in_use.

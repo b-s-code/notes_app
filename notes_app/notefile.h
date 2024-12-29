@@ -1,6 +1,7 @@
 #ifndef NOTEFILE_H
 #define NOTEFILE_H
 
+#include <qdir.h>
 #include <string>
 #include <vector>
 #include <mutex>
@@ -67,6 +68,11 @@ private:
     * The absolute path to the underlying file.
     */
     std::string path;
+
+    /*
+    * Interface to the underlying file.
+    */
+    QFile file;
 };
 
 #endif // NOTEFILE_H
