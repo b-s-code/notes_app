@@ -73,6 +73,12 @@ private:
     * Interface to the underlying file.
     */
     QFile file;
+
+    /*
+    * Throws if unpadded_title is greater than 256 characters.
+    * Else right pads unpadded_title to 256 characters, returning the result.
+    */
+    std::string create_title(const std::string& unpadded_title);
 };
 
 #endif // NOTEFILE_H

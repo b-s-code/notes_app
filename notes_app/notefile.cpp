@@ -36,8 +36,7 @@ NoteFile::NoteFile(std::string file_path)
             std::string default_title = "Untitled";
 
             title = default_title;
-            default_title += "                                                                                                                                                                                                                                                        ";
-            file.write(default_title.c_str());
+            file.write(create_title(default_title).c_str());
         }
         else
         {
@@ -64,10 +63,23 @@ NoteFile::~NoteFile()
         auto iter = std::find(file_paths_in_use.begin(),
                                 file_paths_in_use.end(), path);
 
-        // The possibility of repeated occurences is addressed when *adding* to
+        // The possibility of repeated occurrences is addressed when *adding* to
         // file_paths_in_use, rather than here.
         file_paths_in_use.erase(iter);
     }
+}
+
+std::string NoteFile::create_title(const std::string& unpadded_title)
+{
+    auto l = unpadded_title.length();
+    if (l > 256) // TODO : make all occurrences of 256 use some shared constant.
+    {
+        // Too long!
+        throw;
+    }
+
+    std::string right_padding(256 - l, ' ');
+    return unpadded_title + right_padding;
 }
 
 void NoteFile::UpdateTitle(std::string new_title)
